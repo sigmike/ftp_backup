@@ -1,0 +1,23 @@
+This propgram backups a path to a remote FTP.
+
+Requirements :
+* Ruby
+
+Usage:
+  ftp_backup <config> <backup name> <backup path> [<tar options...>]
+
+It will tar the whole path and save it to <backup name>.tgz on the FTP server.
+
+It will rename the previous backup to <backup name>.last.tgz if it exists.
+
+Notes:
+The program will backup mounted filesystems in the given path. If you want
+to exclude them, add the --one-file-system to the command line.
+
+You can also exclude files with --exclude=foo.
+
+Example :
+* Copy sample_config.yml to /etc/ftp_backup.yml
+* Edit /etc/ftp_backup.yml
+* Run "ftp_backup /etc/ftp_backup.yml root / --one-file-system"
+

@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require 'net/ftp'
+require 'yaml'
+
+if ARGV.size < 3
+  STDERR.puts "Usage: #$0 <config> <backup name> <backup path> [<tar options...>]"
+  exit 1
+end
+
+config_file, backup_name, backup_path, *options = ARGV
+config = YAML.load(File.read(config_file))
+
+Net::FTP.open(config["server"]) do |ftp|
+  ftp.debug_mode = true
+  ftp.login(config["login"], config["password"])
+  files = ftp.nlst
+  last_backup = "#{backup_name}.last.tgz"
+  backup = "#{backup_name}.tgz"
+  
+  ftp.delete(last_backup) if files.include?(last_backup)
+  ftp.rename(backup, last_backup) if files.include?(backup)
+  
+  block_size = 1024 * 1024
+  options = options.map { |arg| arg.inspect}.join(" ")
+  command = "|tar -czf - #{options} #{backup_path}"
+  ftp.putbinaryfile(command, backup, block_size)
+end
