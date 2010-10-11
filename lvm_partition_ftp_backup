@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'net/ftp'
-require 'yaml'
-
 if ARGV.size < 5
   STDERR.puts "Usage: #$0 <config> <volume group> <logical volume> <change size> <partition number> [<tar options...>]"
   exit 1
