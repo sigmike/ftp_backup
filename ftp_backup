@@ -23,6 +23,8 @@ Net::FTP.open(config["server"]) do |ftp|
   
   block_size = 1024 * 1024
   options = options.map { |arg| arg.inspect}.join(" ")
-  command = "|tar -czf - #{options} #{backup_path}"
-  ftp.putbinaryfile(command, backup, block_size)
+  command = "|tar -czf - #{options} ."
+  Dir.chdir backup_path do
+    ftp.putbinaryfile(command, backup, block_size)
+  end
 end

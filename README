@@ -21,3 +21,12 @@ Example :
 * Edit /etc/ftp_backup.yml
 * Run "ftp_backup /etc/ftp_backup.yml root / --one-file-system"
 
+LVM backup:
+lvm_partition_ftp_backup can be used to backup a partition inside a LVM
+logical volume.
+
+Usage: lvm_partition_ftp_backup <config> <volume group> <logical volume> <change size> <partition number> [<tar options...>]
+
+<change size> is the size to reserve for the snapshot. It must be sufficient
+to store changes in the logical volume while the backup is in progress. You
+can use suffixes, for example 10M or 1G.

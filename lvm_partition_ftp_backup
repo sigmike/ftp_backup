@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+require 'net/ftp'
+require 'yaml'
+
+if ARGV.size < 5
+  STDERR.puts "Usage: #$0 <config> <volume group> <logical volume> <change size> <partition number> [<tar options...>]"
+  exit 1
+end
+
+config_file, volume_group, logical_volume, change_size, partition_number, *options = ARGV
+
+snapshot = "#{logical_volume}_backup_snapshot"
+device = "/dev/#{volume_group}/#{logical_volume}"
+snapshot_device = "/dev/#{volume_group}/#{snapshot}"
+mount_point = "/mnt/#{snapshot}"
+partition_device = "/dev/mapper/#{volume_group.gsub('-', '--')}-#{snapshot.gsub('-', '--')}#{partition_number}"
+
+system "lvcreate -L#{change_size} -s -n #{snapshot} #{device}" or exit 1
+at_exit { system "lvremove -f #{snapshot_device}" }
+
+system "kpartx -v -a #{snapshot_device}" or exit 1
+at_exit { sleep 1; system "kpartx -v -d #{snapshot_device}" }
+
+Dir.mkdir mount_point
+at_exit { Dir.rmdir mount_point }
+
+system "mount #{partition_device} #{mount_point}" or exit 1
+at_exit { system "umount #{mount_point}" }
+
+ftp_backup = File.join(File.dirname(__FILE__), "ftp_backup")
+system ftp_backup, config_file, logical_volume, mount_point, *options
