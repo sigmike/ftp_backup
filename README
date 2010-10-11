@@ -30,3 +30,7 @@ Usage: lvm_partition_ftp_backup <config> <volume group> <logical volume> <change
 <change size> is the size to reserve for the snapshot. It must be sufficient
 to store changes in the logical volume while the backup is in progress. You
 can use suffixes, for example 500M or 1G.
+
+Requirements:
+* LVM
+* kpartx
